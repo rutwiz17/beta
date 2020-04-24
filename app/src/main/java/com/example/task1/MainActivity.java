@@ -1,10 +1,13 @@
 package com.example.task1;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.PersistableBundle;
 import android.os.Vibrator;
 import android.util.Log;
 import android.view.View;
@@ -31,26 +34,26 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        timer=findViewById(R.id.timer);
-        input=findViewById(R.id.input);
-        op1=findViewById(R.id.op1);
-        op2=findViewById(R.id.op2);
-        op3=findViewById(R.id.op3);
-        gen=findViewById(R.id.gen);
-        score=findViewById(R.id.score);
-        hs=findViewById(R.id.hs);
-        SharedPreferences myScore=this.getSharedPreferences("HIGH SCORE",MODE_PRIVATE);
-        h=myScore.getInt("SCORE",0);
-        hs.setText("HIGH SCORE : "+h);
-        vibrator=(Vibrator)getSystemService(VIBRATOR_SERVICE);
-        view=this.getWindow().getDecorView();
+        timer = findViewById(R.id.timer);
+        input = findViewById(R.id.input);
+        op1 = findViewById(R.id.op1);
+        op2 = findViewById(R.id.op2);
+        op3 = findViewById(R.id.op3);
+        gen = findViewById(R.id.gen);
+        score = findViewById(R.id.score);
+        hs = findViewById(R.id.hs);
+        SharedPreferences myScore = this.getSharedPreferences("HIGH SCORE", MODE_PRIVATE);
+        h = myScore.getInt("SCORE", 0);
+        hs.setText("HIGH SCORE : " + h);
+        vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+        view = this.getWindow().getDecorView();
         gen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!(input.getText().toString().trim().length()>0))
-                    Toast.makeText(MainActivity.this,"ENTER A NUMBER",Toast.LENGTH_LONG).show();
-                else if(Integer.parseInt(input.getText().toString())<5)
-                    Toast.makeText(MainActivity.this,"ENTER A NUMBER GREATER THAN 5",Toast.LENGTH_LONG).show();
+                if (!(input.getText().toString().trim().length() > 0))
+                    Toast.makeText(MainActivity.this, "ENTER A NUMBER", Toast.LENGTH_LONG).show();
+                else if (Integer.parseInt(input.getText().toString()) < 5)
+                    Toast.makeText(MainActivity.this, "ENTER A NUMBER GREATER THAN 5", Toast.LENGTH_LONG).show();
                 else {
                     num = Integer.parseInt(input.getText().toString());
                     Random rand = new Random();
@@ -114,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
                     op1.setText("");
                     op2.setText("");
                     op3.setText("");
-                    startstop();
+                    stoptimer();
                 }
             }
         });
@@ -153,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
                     op1.setText("");
                     op2.setText("");
                     op3.setText("");
-                    startstop();
+                    stoptimer();
                 }
             }
 
@@ -193,11 +196,30 @@ public class MainActivity extends AppCompatActivity {
                     op1.setText("");
                     op2.setText("");
                     op3.setText("");
-                    startstop();
+                    stoptimer();
                 }
             }
         });
         updatetimer();
+        if (savedInstanceState != null) {
+            n1 = savedInstanceState.getInt("B1");
+            n2 = savedInstanceState.getInt("B2");
+            n3 = savedInstanceState.getInt("B3");
+            sc = savedInstanceState.getInt("SCORE");
+            score.setText("SCORE : " + sc);
+            h = savedInstanceState.getInt("HS");
+            hs.setText("HIGH SCORE : " + h);
+            op1.setText(savedInstanceState.getString("op1"));
+            op2.setText(savedInstanceState.getString("op2"));
+            op3.setText(savedInstanceState.getString("op3"));
+            timerr = savedInstanceState.getBoolean("timerr");
+            tleft = savedInstanceState.getLong("tleft");
+            updatetimer();
+            if (timerr){
+                starttimer();
+            }
+        }
+
     }
     public void startstop(){
         if(timerr){
@@ -239,9 +261,9 @@ public class MainActivity extends AppCompatActivity {
         timerr=true;
      }
      public void stoptimer(){
-        tleft=10000;
         ctimer.cancel();
         timerr=false;
+        tleft=10000;
      }
      public void updatetimer(){
         int seconds=(int)tleft/1000;
@@ -249,4 +271,19 @@ public class MainActivity extends AppCompatActivity {
         timelefttxt=""+seconds;
         timer.setText("TIME LEFT : "+timelefttxt);
      }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("B1", n1);
+        outState.putInt("B2", n2);
+        outState.putInt("B3", n3);
+        outState.putInt("SCORE", sc);
+        outState.putInt("HS", h);
+        outState.putString("op1",op1.getText().toString());
+        outState.putString("op2",op2.getText().toString());
+        outState.putString("op3",op3.getText().toString());
+        outState.putBoolean("timerr",timerr);
+        outState.putLong("tleft",tleft);
+    }
 }
